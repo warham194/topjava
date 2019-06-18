@@ -10,12 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryMealRepositoryImpl implements MealRepository {
     private Map<Integer, Meal> repository = new ConcurrentHashMap<>();
-    private AtomicInteger counter = new AtomicInteger();
+    private AtomicInteger counter = new AtomicInteger(0);
 
     {
         MealsUtil.MEALS.forEach(this::save);
     }
-
 
     @Override
     public Meal save(Meal meal) {
@@ -24,6 +23,7 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
             repository.put(meal.getId(), meal);
             return meal;
         }
+        // treat case: update, but absent in storage
         return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
@@ -42,3 +42,4 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         return repository.values();
     }
 }
+
